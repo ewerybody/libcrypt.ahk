@@ -32,13 +32,15 @@ LC_Bin2Ascii(Bin) {
 }
 
 LC_BinStr_EncodeText(Text, Pretty:=False, Encoding:="UTF-8") {
-	VarSetStrCapacity(&Bin, StrPut(Text, Encoding))
-	LC_BinStr_Encode(&BinStr, &Bin, StrPut(Text, Bin, Encoding)-1, Pretty)
+	; VarSetStrCapacity(&Bin, StrPut(Text, Encoding))
+    Bin := Buffer(StrPut(Text, Encoding))
+    len := StrPut(Text, Bin, Encoding)
+	LC_BinStr_Encode(&BinStr, &Bin, len - 1, Pretty)
 	return BinStr
 }
 
 LC_BinStr_DecodeText(Text, Encoding:="UTF-8") {
-	Len := LC_BinStr_Decode(Bin, Text)
+	Len := LC_BinStr_Decode(&Bin, &Text)
 	return StrGet(&Bin, Len, Encoding)
 }
 
@@ -56,13 +58,13 @@ LC_BinStr_Encode(&Out, &Inn, InLen, Pretty:=False) {
 
 LC_BinStr_Decode(&Out, &Inn) {
 	ByteCount := StrLen(Inn)/8
-	VarSetStrCapacity(Out, ByteCount)
+	VarSetStrCapacity(&Out, ByteCount)
 	BitIndex := 1
 	Loop ByteCount
 	{
 		Byte := 0
 		Loop 8
 			Byte := Byte<<1 | SubStr(Inn, BitIndex++, 1)
-		NumPut(Byte, Out, A_Index-1, "UChar")
+		NumPut("UChar", Byte, Out, A_Index-1)
 	}
 }
